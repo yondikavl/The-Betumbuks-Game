@@ -2,39 +2,43 @@ import pygame
 
 class Fighter():
   def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, sound):
-    self.player = player
-    self.size = data[0]
-    self.image_scale = data[1]
-    self.offset = data[2]
-    self.flip = flip
-    self.animation_list = self.load_images(sprite_sheet, animation_steps)
-    self.action = 0#0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
-    self.frame_index = 0
-    self.image = self.animation_list[self.action][self.frame_index]
-    self.update_time = pygame.time.get_ticks()
-    self.rect = pygame.Rect((x, y, 80, 180))
-    self.vel_y = 0
-    self.running = False
-    self.jump = False
-    self.attacking = False
-    self.attack_type = 0
-    self.attack_cooldown = 0
-    self.attack_sound = sound
-    self.hit = False
-    self.health = 100
-    self.alive = True
+    self.player = player # nomor pemain, 1 atau 2
+    self.size = data[0] # ukuran gambar karakter
+    self.image_scale = data[1] # skala gambar karakter
+    self.offset = data[2] # jarak antara karakter dengan objek lain
+    self.flip = flip # True jika karakter menghadap ke kiri, False jika menghadap ke kanan
+    self.animation_list = self.load_images(sprite_sheet, animation_steps) # daftar animasi karakter
+    self.action = 0 # tindakan saat ini, 0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
+    self.frame_index = 0 # indeks frame saat ini dalam daftar animasi
+    self.image = self.animation_list[self.action][self.frame_index] # gambar saat ini
+    self.update_time = pygame.time.get_ticks() # waktu terakhir gambar diperbarui
+    self.rect = pygame.Rect((x, y, 80, 180)) # kotak pemadat untuk deteksi tabrakan
+    self.vel_y = 0 # kecepatan vertikal karakter
+    self.running = False # True jika karakter sedang berlari, False jika tidak
+    self.jump = False # True jika karakter sedang melompat, False jika tidak
+    self.attacking = False # True jika karakter sedang menyerang, False jika tidak
+    self.attack_type = 0 # jenis serangan saat ini, 0:tidak menyerang #1:serangan 1 #2:serangan 2
+    self.attack_cooldown = 0 # waktu pendingin untuk serangan
+    self.attack_sound = sound # efek suara serangan
+    self.hit = False # True jika karakter terkena serangan, False jika tidak
+    self.health = 100 # kesehatan karakter
+    self.alive = True # True jika karakter masih hidup, False jika tidak
 
 
   def load_images(self, sprite_sheet, animation_steps):
-    #extract images from spritesheet
-    animation_list = []
+    # Memuat gambar dari spritesheet
+    animation_list = []  # Inisialisasi list kosong untuk menampung gambar animasi
     for y, animation in enumerate(animation_steps):
-      temp_img_list = []
-      for x in range(animation):
-        temp_img = sprite_sheet.subsurface(x * self.size, y * self.size, self.size, self.size)
-        temp_img_list.append(pygame.transform.scale(temp_img, (self.size * self.image_scale, self.size * self.image_scale)))
-      animation_list.append(temp_img_list)
+        temp_img_list = []  # Inisialisasi list kosong untuk menampung gambar animasi sementara
+        for x in range(animation):
+            # Memotong gambar dari spritesheet dengan menggunakan subsurface() method
+            temp_img = sprite_sheet.subsurface(x * self.size, y * self.size, self.size, self.size)
+            # Mengubah ukuran gambar sesuai dengan ukuran skala gambar
+            temp_img_list.append(pygame.transform.scale(temp_img, (self.size * self.image_scale, self.size * self.image_scale)))
+        # Menambahkan gambar animasi ke dalam animation_list
+        animation_list.append(temp_img_list)
     return animation_list
+
 
 
   def move(self, screen_width, screen_height, surface, target, round_over):
