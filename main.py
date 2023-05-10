@@ -18,7 +18,9 @@ clock = pygame.time.Clock()
 FPS = 60
 last_count_update = pygame.time.get_ticks()
 
-game_name = pygame.image.load("assets/images/The Betumbuks.png").convert_alpha()
+bg_img = pygame.image.load("assets/images/background/bg-menu.png").convert_alpha()
+glwin_img = pygame.image.load("assets/images/background/bg-glwin.png").convert_alpha()
+lswin_img = pygame.image.load("assets/images/background/bg-lswin.png").convert_alpha()
 
 # load music and sounds
 pygame.mixer.music.load("assets/audio/bg.mp3")
@@ -34,10 +36,10 @@ icon = pygame.image.load("assets/images/icons/icon.png").convert_alpha()
 pygame.display.set_icon(icon)
 
 # define font
-menu_font_big = pygame.font.Font("assets/fonts/turok.ttf", 75)
-menu_font_small = pygame.font.Font("assets/fonts/turok.ttf", 50)
-count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
-score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
+menu_font_big = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 40)
+menu_font_small = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 20)
+count_font = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 40)
+score_font = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 15)
 
 
 # function for drawing text
@@ -48,35 +50,21 @@ def draw_text(text, font, text_col, x, y):
 
 def draw_menu():
     if PAUSE_MENU:
-        name_len = GAME_NAME.__len__()
         background_sprites.draw(screen)
         background_sprites.update()
-        name_pos_x = SCREEN_WIDTH - ((name_len * 30) * 2)
-        draw_text("PAUSE MENU !!!", menu_font_big, RED, name_pos_x, 60)
-        draw_text("Press Enter to Resume", menu_font_small, GREEN, 250, 330)
+        draw_text("PAUSE MENU !!!", menu_font_big, RED, 250, 60)
+        draw_text("Press Enter to Resume", menu_font_small, WHITE, 300, 500)
     elif END_MENU:
-        screen.fill((0, 0, 0))
-        name_len = GAME_NAME.__len__()
-        name_pos_x = SCREEN_WIDTH - ((name_len * 30) * 2)
-        BOXER_DATA[1] = 3
         if player.health == 0:
+            screen.blit(lswin_img, (0, 0))
             enemy.menu_character(screen)
         elif enemy.health == 0:
+            screen.blit(glwin_img, (0, 0))
             player.menu_character(screen)
-        draw_text(
-            "La Squadra Victory" if player.health == 0 else "Green Legion Victory", menu_font_big, RED,
-            200 if player.health == 0 else 180,
-            60,
-        )
-        draw_text("Press Enter to Quit", menu_font_small, WHITE, 250, 400)
     else:
-        name_len = GAME_NAME.__len__()
-        name_pos_x = SCREEN_WIDTH - ((name_len * 30) * 2)
-        screen.fill((0, 0, 0))
-        BOXER_DATA[1] = 3
-        draw_text(GAME_NAME, menu_font_big, WHITE, name_pos_x, 60)
-        draw_text("Press Enter to start", menu_font_small, RED, 250, 440)
+        screen.blit(bg_img, (0, 0))
         player.menu_character(screen)
+        draw_text("Press Enter to Start", menu_font_small, WHITE, 300, 500)
     clock.tick(45)
 
 
@@ -117,8 +105,8 @@ while run:
         green_health_bar.draw(screen)
         lasquad_health_bar.update(enemy.health)
         lasquad_health_bar.draw(screen)
-        draw_text("Green Legion", score_font, WHITE, 20, 30)
-        draw_text("La Squadra", score_font, WHITE, 840, 30)
+        draw_text("Green Legion", score_font, WHITE, 20, 50)
+        draw_text("La Squadra", score_font, WHITE, 830, 50)
 
         # update countdown
         if intro_count <= 0:

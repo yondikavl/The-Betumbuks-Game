@@ -25,5 +25,11 @@ BOXER_SCALE = 1
 BOXER_OFFSET = [112, 50]
 BOXER_DATA = [BOXER_SIZE, BOXER_SCALE, BOXER_OFFSET]
 
+# define fighter variables
+BOXER_SIZE = 250
+BOXER_SCALE = 1
+BOXER_OFFSET = [112, 50]
+BOXER_BG = [BOXER_SIZE, BOXER_SCALE, BOXER_OFFSET]
+
 # define number of steps in each animation
 BOXER_ANIMATION_STEPS = [6, 10, 4, 14, 14, 7, 6, 5, 3, 3]

@@ -265,7 +265,7 @@ class Fighter:
             self.action += 1
             if self.action > len(self.animation_list[self.action]):
                 self.action = 0
-        surface.blit(pygame.transform.scale_by(self.image, 1.25), (350, 150))
+        surface.blit(pygame.transform.scale_by(self.image, 1.25), (350, 200))
 
     def attack(self, target):
         if self.attack_cooldown == 0:
