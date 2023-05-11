@@ -8,21 +8,21 @@ from health_bar import LaSquadra_Health, GreenLegion_Health
 mixer.init()
 pygame.init()
 
-
+# set ukuran layar dengan lebar dan tinggi dari data.py
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(GAME_NAME)
-
 
 # set framerate
 clock = pygame.time.Clock()
 FPS = 60
+
+# last_count_update akan digunakan nanti pada saat countdown
 last_count_update = pygame.time.get_ticks()
 
+# load gambar background dan music
 bg_img = pygame.image.load("assets/images/background/bg-menu.png").convert_alpha()
 glwin_img = pygame.image.load("assets/images/background/bg-glwin.png").convert_alpha()
 lswin_img = pygame.image.load("assets/images/background/bg-lswin.png").convert_alpha()
-
-# load music and sounds
 pygame.mixer.music.load("assets/audio/bg.mp3")
 pygame.mixer.music.set_volume(0.1)
 pygame.mixer.music.play(-1, 0.0, 5000)
@@ -35,122 +35,141 @@ victory_img = pygame.image.load("assets/images/icons/victory.png").convert_alpha
 icon = pygame.image.load("assets/images/icons/icon.png").convert_alpha()
 pygame.display.set_icon(icon)
 
-# define font
+# mendefinisikan font
 menu_font_big = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 40)
 menu_font_small = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 20)
 count_font = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 40)
 score_font = pygame.font.Font("assets/fonts/Super Mario Bros.ttf", 15)
-
 
 # function for drawing text
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
-
+# function untuk menggambar menu
 def draw_menu():
     if PAUSE_MENU:
-        background_sprites.draw(screen)
+        # memperbaharui dan menggambar background sprite
         background_sprites.update()
+        background_sprites.draw(screen)
+
         draw_text("PAUSE MENU !!!", menu_font_big, RED, 250, 60)
         draw_text("Press Enter to Resume", menu_font_small, WHITE, 300, 500)
+
     elif END_MENU:
-        if player.health == 0:
+        if fighter1.health == 0:
+            # menggambar background kemenangan La Squadra dan karakter fighter2
             screen.blit(lswin_img, (0, 0))
-            enemy.menu_character(screen)
-        elif enemy.health == 0:
+            fighter2.menu_character(screen)
+        elif fighter2.health == 0:
+            # menggambar background kemenangan Green Legion dan karakter fighter1
             screen.blit(glwin_img, (0, 0))
-            player.menu_character(screen)
+            fighter1.menu_character(screen)
     else:
+        # menggambar background menu utama dan karakter fighter1
         screen.blit(bg_img, (0, 0))
-        player.menu_character(screen)
+        fighter1.menu_character(screen)
         draw_text("Press Enter to Start", menu_font_small, WHITE, 300, 500)
-    clock.tick(45)
 
+    # menampilkan perubahan terbaru ke layar
+    pygame.display.flip()
 
-# create two instances of fighters
-player = Fighter(1, 200, 310, False, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
-enemy = Fighter(2, 760, 310, True, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
+# membuat 2 instansiasi fighter
+fighter1 = Fighter(1, 200, 310, False, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
+fighter2 = Fighter(2, 760, 310, True, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
 
-# create two instances of button
-green_health_bar = GreenLegion_Health(player.health, 20, 20)
-lasquad_health_bar = LaSquadra_Health(enemy.health, 580, 20)
+# membuat 2 instansiasi health bar
+green_health_bar = GreenLegion_Health(fighter1.health, 20, 20)
+lasquad_health_bar = LaSquadra_Health(fighter2.health, 580, 20)
 
 background_sprites = pygame.sprite.Group()
 background = Background()
 background_sprites.add(background)
 
-
 # game loop
 run = True
 while run:
     clock.tick(FPS)
-
-    if MENU == True:
-        # draw background
+    # Menu utama
+    if MENU:
+        # Menggambar latar belakang menu
         draw_menu()
+        
+        # Mengambil input tombol keyboard
         key = pygame.key.get_pressed()
+        
+        # Jika tombol "Enter" ditekan, keluar dari menu
         if key[pygame.K_RETURN]:
             MENU = False
             round_over = False
+        
+        # Jika dalam menu akhir dan tombol "Enter" ditekan, keluar dari permainan
         if END_MENU:
             if key[pygame.K_RETURN]:
                 run = False
+
+    # Saat permainan sedang berjalan
     else:
+        # Menggambar latar belakang
         background_sprites.draw(screen)
         background_sprites.update()
 
-        # show player stats
-        green_health_bar.update(player.health)
+        # Menampilkan status pejuang 1 dan pejuang 2
+        green_health_bar.update(fighter1.health)
         green_health_bar.draw(screen)
-        lasquad_health_bar.update(enemy.health)
+        lasquad_health_bar.update(fighter2.health)
         lasquad_health_bar.draw(screen)
         draw_text("Green Legion", score_font, WHITE, 20, 50)
         draw_text("La Squadra", score_font, WHITE, 830, 50)
 
-        # update countdown
+        # Memperbarui countdown
         if intro_count <= 0:
-            # move fighters
-            player.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, enemy, round_over)
-            enemy.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, player, round_over)
+            # Memindahkan pejuang
+            fighter1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter2, round_over)
+            fighter2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter1, round_over)
         else:
-            # display count timer
+            # Menampilkan timer countdown
             draw_text(
                 str(intro_count), count_font, RED, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3
             )
-            # update count timer
+            # Memperbarui timer countdown
             if (pygame.time.get_ticks() - last_count_update) >= 1000:
                 intro_count -= 1
                 last_count_update = pygame.time.get_ticks()
 
-        # update fighters
-        player.update(enemy)
-        enemy.update(player)
+        # Memperbarui fighter
+        fighter1.update(fighter2)
+        fighter2.update(fighter1)
 
-        # draw fighters
-        enemy.draw(screen)
-        player.draw(screen)
+        # Menggambar fighter
+        fighter2.draw(screen)
+        fighter1.draw(screen)
 
-        if player.health == 0 or enemy.health == 0:
+        # Jika salah satu pejuang telah kalah, tampilkan menu akhir
+        if fighter1.health == 0 or fighter2.health == 0:
             round_over = True
             END_MENU = True
 
-        if round_over == True:
+        # Jika menu akhir ditampilkan, tampilkan menu utama
+        if round_over:
             MENU = True
             END_MENU = True
             PAUSE_MENU = False
 
-    # event handler
+    # Handler untuk event keyboard
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
     key = pygame.key.get_pressed()
+
+    # Jika tombol "Escape" ditekan, tampilkan menu utama
     if key[pygame.K_ESCAPE]:
         MENU = True
         PAUSE_MENU = True
 
-    # update display
+    # Memperbarui layar
     pygame.display.flip()
+
 
 # exit pygame
 pygame.quit()
