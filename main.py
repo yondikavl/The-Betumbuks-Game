@@ -1,6 +1,6 @@
 import pygame
 from pygame import mixer
-from fighter import Fighter
+from fighter import GreenLegion, LaSquadra
 from background import Background
 from data import *
 from health_bar import LaSquadra_Health, GreenLegion_Health
@@ -31,7 +31,6 @@ pygame.mixer.music.play(-1, 0.0, 5000)
 boxer_sheet = pygame.image.load("assets/images/boxer/boxer.png").convert_alpha()
 
 # load icons
-victory_img = pygame.image.load("assets/images/icons/victory.png").convert_alpha()
 icon = pygame.image.load("assets/images/icons/icon.png").convert_alpha()
 pygame.display.set_icon(icon)
 
@@ -75,8 +74,8 @@ def draw_menu():
     pygame.display.flip()
 
 # membuat 2 instansiasi fighter
-fighter1 = Fighter(1, 200, 310, False, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
-fighter2 = Fighter(2, 760, 310, True, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
+fighter1 = GreenLegion(1, 200, 310, False, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
+fighter2 = LaSquadra(2, 760, 310, True, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
 
 # membuat 2 instansiasi health bar
 green_health_bar = GreenLegion_Health(fighter1.health, 20, 20)
