@@ -7,6 +7,8 @@ RED = (255, 0, 0)
 GREEN = (0, 230, 0)
 DARK_GREEN = (0, 150, 0)
 WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
 
 # mendefinisikan variabel permainan
 GAME_NAME = "TheBetumbuks"

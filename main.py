@@ -1,7 +1,7 @@
 import pygame
 from pygame import mixer
 from fighter import GreenLegion, LaSquadra
-from background import Background
+# from background import Background
 from data import *
 from health_bar import LaSquadra_Health, GreenLegion_Health
 
@@ -21,6 +21,7 @@ last_count_update = pygame.time.get_ticks()
 
 # load gambar background dan music
 bg_img = pygame.image.load("assets/images/background/bg-menu.png").convert_alpha()
+bg_main = pygame.image.load("assets/images/background/bg-main.png").convert_alpha()
 glwin_img = pygame.image.load("assets/images/background/bg-glwin.png").convert_alpha()
 lswin_img = pygame.image.load("assets/images/background/bg-lswin.png").convert_alpha()
 pygame.mixer.music.load("assets/audio/bg.mp3")
@@ -49,8 +50,7 @@ def draw_text(text, font, text_col, x, y):
 def draw_menu():
     if PAUSE_MENU:
         # memperbaharui dan menggambar background sprite
-        background_sprites.update()
-        background_sprites.draw(screen)
+        screen.blit(bg_main, (0, 0))
 
         draw_text("PAUSE MENU !!!", menu_font_big, RED, 250, 60)
         draw_text("Press Enter to Resume", menu_font_small, WHITE, 300, 500)
@@ -74,16 +74,12 @@ def draw_menu():
     pygame.display.flip()
 
 # membuat 2 instansiasi fighter
-fighter1 = GreenLegion(1, 200, 310, False, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
-fighter2 = LaSquadra(2, 760, 310, True, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
+fighter1 = GreenLegion(1, 200, 260, False, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
+fighter2 = LaSquadra(2, 760, 260, True, BOXER_DATA, boxer_sheet, BOXER_ANIMATION_STEPS)
 
 # membuat 2 instansiasi health bar
 green_health_bar = GreenLegion_Health(fighter1.health, 20, 20)
 lasquad_health_bar = LaSquadra_Health(fighter2.health, 580, 20)
-
-background_sprites = pygame.sprite.Group()
-background = Background()
-background_sprites.add(background)
 
 # game loop
 run = True
@@ -110,16 +106,15 @@ while run:
     # Saat permainan sedang berjalan
     else:
         # Menggambar latar belakang
-        background_sprites.draw(screen)
-        background_sprites.update()
+        screen.blit(bg_main, (0, 0))
 
         # Menampilkan status pejuang 1 dan pejuang 2
         green_health_bar.update(fighter1.health)
         green_health_bar.draw(screen)
         lasquad_health_bar.update(fighter2.health)
         lasquad_health_bar.draw(screen)
-        draw_text("Green Legion", score_font, WHITE, 20, 50)
-        draw_text("La Squadra", score_font, WHITE, 830, 50)
+        draw_text("Green Legion", score_font, BLACK, 20, 50)
+        draw_text("La Squadra", score_font, BLACK, 830, 50)
 
         # Memperbarui countdown
         if intro_count <= 0:

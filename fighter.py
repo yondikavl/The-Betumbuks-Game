@@ -1,8 +1,5 @@
 import pygame
 
-dbclock = pygame.time.Clock()
-
-
 class Fighter:
     def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps):
         self.player = player
@@ -149,12 +146,10 @@ class Fighter:
                 target.hit = False
 
     def update_action(self, new_action):
-        # check if the new action is different to the previous one
-        if new_action != self.action:
-            self.action = new_action
-            # update the animation settings
-            self.frame_index = 0
-            self.update_time = pygame.time.get_ticks()
+        if new_action != self.action: # jika tindakan baru berbeda dengan tindakan sebelumnya
+            self.action = new_action # update tindakan dengan tindakan baru
+            self.frame_index = 0 # atur ulang indeks frame untuk animasi
+            self.update_time = pygame.time.get_ticks() # atur ulang waktu pembaruan animasi
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
