@@ -1,7 +1,6 @@
 import pygame
 from pygame import mixer
 from fighter import GreenLegion, LaSquadra
-# from background import Background
 from data import *
 from health_bar import LaSquadra_Health, GreenLegion_Health
 
@@ -25,8 +24,14 @@ bg_main = pygame.image.load("assets/images/background/bg-main.png").convert_alph
 glwin_img = pygame.image.load("assets/images/background/bg-glwin.png").convert_alpha()
 lswin_img = pygame.image.load("assets/images/background/bg-lswin.png").convert_alpha()
 pygame.mixer.music.load("assets/audio/bg.mp3")
-pygame.mixer.music.set_volume(0.1)
+green_legion_fx = pygame.mixer.Sound("assets/audio/punch.wav")
+lasquadra_fx = pygame.mixer.Sound("assets/audio/uh.wav")
+
+# Volume
+pygame.mixer.music.set_volume(0)
 pygame.mixer.music.play(-1, 0.0, 5000)
+green_legion_fx.set_volume(1)
+lasquadra_fx.set_volume(1)
 
 # load spritesheets
 greenlegion_sheet = pygame.image.load("assets/images/boxer/ijo.png").convert_alpha()
@@ -52,7 +57,6 @@ def draw_menu():
     if PAUSE_MENU:
         # memperbaharui dan menggambar background sprite
         screen.blit(bg_main, (0, 0))
-
         draw_text("PAUSE MENU !!!", menu_font_big, RED, 250, 60)
         draw_text("Press Enter to Resume", menu_font_small, WHITE, 300, 500)
 
@@ -75,8 +79,8 @@ def draw_menu():
     pygame.display.flip()
 
 # membuat 2 instansiasi fighter
-fighter1 = GreenLegion(1, 200, 260, False, BOXER_DATA, greenlegion_sheet, BOXER_ANIMATION_STEPS)
-fighter2 = LaSquadra(2, 760, 260, True, BOXER_DATA, lasquadra_sheet, BOXER_ANIMATION_STEPS)
+fighter1 = GreenLegion(200, 260, False, BOXER_DATA, greenlegion_sheet, BOXER_ANIMATION_STEPS, green_legion_fx)
+fighter2 = LaSquadra(760, 260, True, BOXER_DATA, lasquadra_sheet, BOXER_ANIMATION_STEPS, lasquadra_fx)
 
 # membuat 2 instansiasi health bar
 green_health_bar = GreenLegion_Health(fighter1.health, 20, 20)
@@ -109,7 +113,7 @@ while run:
         # Menggambar latar belakang
         screen.blit(bg_main, (0, 0))
 
-        # Menampilkan status pejuang 1 dan pejuang 2
+        # Menampilkan status fighter 1 dan fighter 2
         green_health_bar.update(fighter1.health)
         green_health_bar.draw(screen)
         lasquad_health_bar.update(fighter2.health)
@@ -119,7 +123,7 @@ while run:
 
         # Memperbarui countdown
         if intro_count <= 0:
-            # Memindahkan pejuang
+            # Memindahkan fighter
             fighter1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter2, round_over)
             fighter2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter1, round_over)
         else:
@@ -140,7 +144,7 @@ while run:
         fighter2.draw(screen)
         fighter1.draw(screen)
 
-        # Jika salah satu pejuang telah kalah, tampilkan menu akhir
+        # Jika salah satu fighter telah kalah, tampilkan menu akhir
         if fighter1.health == 0 or fighter2.health == 0:
             round_over = True
             END_MENU = True

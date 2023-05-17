@@ -1,10 +1,9 @@
 import pygame
 
 class Fighter:
-    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps):
-        self.player = player
-        self.size = data[0]
-        self.image_scale = data[1]
+    def __init__(self, x, y, flip, data, sprite_sheet, animation_steps, sound):
+        self.__size = data[0]
+        self.__scale = data[1]
         self.offset = data[2]
         self.flip = flip
         self.animation_list = self.load_images(sprite_sheet, animation_steps)
@@ -13,7 +12,7 @@ class Fighter:
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pygame.time.get_ticks()
         self.rect = pygame.Rect((x, y, 80, 180))
-        self.vel_y = 0
+        self.vel_y = 0   
         self.running = False
         self.jump = False
         self.attacking = False
@@ -25,7 +24,20 @@ class Fighter:
         self.alive = True
         self.should_move = False
         self.should_attack = False
-        
+        self.attack_sound = sound
+    
+    def get_size(self):
+        return self.__size
+    
+    def set_size(self, size):
+        self.__size == size
+    
+    def get_scale(self):
+        return self.__scale
+    
+    def set_scale(self, scale):
+        self.__scale = scale
+    
     def load_images(self, sprite_sheet, animation_steps):
         # fungsi untuk memuat gambar-gambar animasi dari sprite sheet
         animation_list = [] # variabel untuk menyimpan daftar gambar animasi
@@ -33,12 +45,12 @@ class Fighter:
             temp_img_list = [] # variabel untuk menyimpan daftar gambar dalam animasi
             for x in range(animation): # untuk setiap gambar dalam animasi, yaitu setiap kolom dalam sprite sheet, lakukan:
                 temp_img = sprite_sheet.subsurface(
-                    x * self.size, y * self.size, self.size, self.size
+                    x * self.get_size(), y * self.get_size(), self.get_size(), self.get_size()
                 ) # potong gambar dari sprite sheet sesuai ukuran yang diinginkan
                 temp_img_list.append(
                     pygame.transform.scale(
                         temp_img,
-                        (self.size * self.image_scale, self.size * self.image_scale),
+                        (self.get_size() * self.get_scale(), self.get_size() * self.get_scale()),
                     )
                 ) # ubah ukuran gambar dan tambahkan ke daftar gambar dalam animasi
             animation_list.append(temp_img_list) # tambahkan daftar gambar dalam animasi ke daftar gambar animasi
@@ -47,73 +59,8 @@ class Fighter:
     def move(self):
         pass
 
-    # handle animation updates
-    def update(self, target):
-        # check what action the player is performing
-        if self.player:
-            if self.health <= 0:
-                self.health = 0
-                self.alive = False
-                self.update_action(8)
-            elif self.attacking == True:
-                if self.attack_type == 1:  # Punch1
-                    self.update_action(2)
-                elif self.attack_type == 2:  # Combo Punch
-                    self.update_action(1)
-                elif self.attack_type == 3:  # Figma Punch
-                    self.update_action(3)
-                elif self.attack_type == 4:  # Normal Kick
-                    self.update_action(5)
-                elif self.attack_type == 5:  # Combo Kick
-                    self.update_action(4)
-                elif self.attack_type == 6:  # Chhotu Kick
-                    self.update_action(6)
-            elif self.jump == True:
-                self.update_action(0)
-            elif self.running == True:
-                self.update_action(7)
-            else:
-                self.update_action(0)
-
-        animation_cooldown = 50
-        # update image
-        self.image = self.animation_list[self.action][self.frame_index]
-        # check if enough time has passed since the last update
-        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
-            self.frame_index += 1
-            self.update_time = pygame.time.get_ticks()
-        # check if the animation has finished
-        if self.frame_index >= len(self.animation_list[self.action]):
-            # if the player is dead then end the animation
-            if self.alive == False:
-                self.frame_index = len(self.animation_list[self.action]) - 1
-            else:
-                self.frame_index = 0
-                # check if an attack was executed
-                if self.player:
-                    if (
-                        self.action == 1
-                        or self.action == 2
-                        or self.action == 3
-                        or self.action == 4
-                        or self.action == 5
-                        or self.action == 6
-                    ):
-                        self.attacking = False
-                        self.attack_cooldown = 20
-                    if target.hit == True:
-                        if self.action == 1:
-                            target.health -= 100
-                        if self.action == 2:
-                            target.health -= 12
-                        if self.action == 3:
-                            target.health -= 25
-                        if self.action == 4:
-                            target.health -= 18
-                        if self.action == 5:
-                            target.health -= 15
-                        if self.action == 6:
-                            target.health -= 12
+    def update(self):
+        pass
 
     def menu_character(self, surface):
         animation_cooldown = 50
@@ -132,18 +79,22 @@ class Fighter:
 
     def attack(self, target):
         if self.attack_cooldown == 0:
-            # execute attack
+            # Melakukan serangan jika cooldown serangan = 0
             self.attacking = True
+            self.attack_sound.play()
+            # Membuat objek Rect untuk area serangan
             attacking_rect = pygame.Rect(
                 self.rect.centerx - (2 * self.rect.width * self.flip),
                 self.rect.y,
                 1 * self.rect.width,
                 self.rect.height,
             )
+            # Mengecek apakah area serangan bertabrakan dengan target
             if attacking_rect.colliderect(target.rect):
                 target.hit = True
             else:
                 target.hit = False
+
 
     def update_action(self, new_action):
         if new_action != self.action: # jika tindakan baru berbeda dengan tindakan sebelumnya
@@ -156,8 +107,8 @@ class Fighter:
         surface.blit(
             img,
             (
-                self.rect.x - (self.offset[0] * self.image_scale),
-                self.rect.y - (self.offset[1] * self.image_scale),
+                self.rect.x - (self.offset[0] * self.get_scale()),
+                self.rect.y - (self.offset[1] * self.get_scale()),
             ),
         )
         
@@ -175,29 +126,28 @@ class GreenLegion(Fighter):
 
         # hanya dapat melakukan aksi lain jika tidak sedang menyerang, hidup, dan ronde belum berakhir
         if self.attacking == False and self.alive == True and round_over == False:
-            # kontrol pemain
-            if self.player:
-                # gerakan
-                if key[pygame.K_a]: # jika tombol "a" ditekan
-                    dx = -SPEED # gerak ke kiri
-                    self.running = True # atur "running" ke True
-                if key[pygame.K_d]: # jika tombol "d" ditekan
-                    dx = SPEED # gerak ke kanan
-                    self.running = True  # atur "running" ke True
-                # lompat
-                if key[pygame.K_SPACE] and self.jump == False: # jika tombol "space" ditekan dan karakter belum sedang melompat
-                    self.vel_y = -25 # atur kecepatan vertikal karakter
-                    self.jump = True  # atur "jump" ke True
-                if (key[pygame.K_e] or key[pygame.K_r] or key[pygame.K_q] or key[pygame.K_w]):
-                    self.attack(target)  # panggil metode "attack" dengan parameter "target"
-                    if key[pygame.K_e]:
-                        self.attack_type = 1
-                    if key[pygame.K_r]:
-                        self.attack_type = 2
-                    if key[pygame.K_q]:
-                        self.attack_type = 4
-                    if key[pygame.K_w]:
-                        self.attack_type = 6
+            # gerakan
+            if key[pygame.K_a]: # jika tombol "a" ditekan
+                dx = -SPEED # gerak ke kiri
+                self.running = True # atur "running" ke True
+            if key[pygame.K_d]: # jika tombol "d" ditekan
+                dx = SPEED # gerak ke kanan
+                self.running = True  # atur "running" ke True
+            # lompat
+            if key[pygame.K_s] and self.jump == False: # jika tombol "space" ditekan dan karakter belum sedang melompat
+                self.vel_y = -25 # atur kecepatan vertikal karakter
+                self.jump = True  # atur "jump" ke True
+            if (key[pygame.K_e] or key[pygame.K_r] or key[pygame.K_q] or key[pygame.K_w]):
+                self.attack(target)  # panggil metode "attack" dengan parameter "target"
+                if key[pygame.K_e]:
+                    self.attack_type = 1
+                if key[pygame.K_r]:
+                    self.attack_type = 2
+                if key[pygame.K_q]:
+                    self.attack_type = 4
+                if key[pygame.K_w]:
+                    self.attack_type = 6
+                
 
         # menerapkan gravitasi
         self.vel_y += GRAVITY # Menambahkan kecepatan vertikal karena efek gravitasi
@@ -226,6 +176,64 @@ class GreenLegion(Fighter):
         # update posisi pemain
         self.rect.x += dx # Menambahkan perubahan posisi horizontal ke posisi X saat ini
         self.rect.y += dy # Menambahkan perubahan posisi vertikal ke posisi Y saat ini
+        
+    def update(self, target):
+        # check what action the player is performing
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
+            self.update_action(8)
+        elif self.attacking == True:
+            if self.attack_type == 1:  # Punch1
+                self.update_action(2)
+            elif self.attack_type == 2:  # Combo Punch
+                self.update_action(1)
+            elif self.attack_type == 3:  # Figma Punch
+                self.update_action(3)
+            elif self.attack_type == 4:  # Normal Kick
+                self.update_action(5)
+            elif self.attack_type == 5:  # Combo Kick
+                self.update_action(4)
+            elif self.attack_type == 6:  # Chhotu Kick
+                self.update_action(6)
+        elif self.jump == True:
+            self.update_action(0)
+        elif self.running == True:
+            self.update_action(7)
+        else:
+            self.update_action(0)
+
+        animation_cooldown = 50
+        # update image
+        self.image = self.animation_list[self.action][self.frame_index]
+        # check if enough time has passed since the last update
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            self.frame_index += 1
+            self.update_time = pygame.time.get_ticks()
+        # check if the animation has finished
+        if self.frame_index >= len(self.animation_list[self.action]):
+            # if the player is dead then end the animation
+            if self.alive == False:
+                self.frame_index = len(self.animation_list[self.action]) - 1
+            else:
+                self.frame_index = 0
+                # check if an attack was executed
+                if (self.action == 1 or self.action == 2 or self.action == 3 or self.action == 4 or self.action == 5 or self.action == 6):
+                    self.attacking = False
+                    self.attack_cooldown = 20
+                if target.hit == True:
+                    if self.action == 1:
+                        target.health -= 30
+                    if self.action == 2:
+                        target.health -= 12
+                    if self.action == 3:
+                        target.health -= 25
+                    if self.action == 4:
+                        target.health -= 18
+                    if self.action == 5:
+                        target.health -= 15
+                    if self.action == 6:
+                        target.health -= 12
 
 class LaSquadra(Fighter):
     def move(self, screen_width, screen_height, surface, target, round_over):
@@ -290,3 +298,62 @@ class LaSquadra(Fighter):
         # update posisi pemain
         self.rect.x += dx # Menambahkan perubahan posisi horizontal ke posisi X saat ini
         self.rect.y += dy # Menambahkan perubahan posisi vertikal ke posisi Y saat ini
+        
+    # handle animation updates
+    def update(self, target):
+        # check what action the player is performing
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
+            self.update_action(8)
+        elif self.attacking == True:
+            if self.attack_type == 1:  # Punch1
+                self.update_action(2)
+            elif self.attack_type == 2:  # Combo Punch
+                self.update_action(1)
+            elif self.attack_type == 3:  # Figma Punch
+                self.update_action(3)
+            elif self.attack_type == 4:  # Normal Kick
+                self.update_action(5)
+            elif self.attack_type == 5:  # Combo Kick
+                self.update_action(4)
+            elif self.attack_type == 6:  # Chhotu Kick
+                self.update_action(6)
+        elif self.jump == True:
+            self.update_action(0)
+        elif self.running == True:
+            self.update_action(7)
+        else:
+            self.update_action(0)
+
+        animation_cooldown = 50
+        # update image
+        self.image = self.animation_list[self.action][self.frame_index]
+        # check if enough time has passed since the last update
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            self.frame_index += 1
+            self.update_time = pygame.time.get_ticks()
+        # check if the animation has finished
+        if self.frame_index >= len(self.animation_list[self.action]):
+            # if the player is dead then end the animation
+            if self.alive == False:
+                self.frame_index = len(self.animation_list[self.action]) - 1
+            else:
+                self.frame_index = 0
+                # check if an attack was executed
+                if (self.action == 1 or self.action == 2 or self.action == 3 or self.action == 4 or self.action == 5 or self.action == 6):
+                    self.attacking = False
+                    self.attack_cooldown = 20
+                if target.hit == True:
+                    if self.action == 1:
+                        target.health -= 30
+                    if self.action == 2:
+                        target.health -= 12
+                    if self.action == 3:
+                        target.health -= 25
+                    if self.action == 4:
+                        target.health -= 18
+                    if self.action == 5:
+                        target.health -= 15
+                    if self.action == 6:
+                        target.health -= 12
