@@ -21,6 +21,7 @@ last_count_update = pygame.time.get_ticks()
 # load gambar background dan music
 bg_img = pygame.image.load("assets/images/background/bg-menu.png").convert_alpha()
 bg_main = pygame.image.load("assets/images/background/bg-main.png").convert_alpha()
+bg_main2 = pygame.image.load("assets/images/background/phnom.png").convert_alpha()
 glwin_img = pygame.image.load("assets/images/background/bg-glwin.png").convert_alpha()
 lswin_img = pygame.image.load("assets/images/background/bg-lswin.png").convert_alpha()
 pygame.mixer.music.load("assets/audio/bg.mp3")
@@ -56,10 +57,10 @@ def draw_text(text, font, text_col, x, y):
 def draw_menu():
     if PAUSE_MENU:
         # memperbaharui dan menggambar background sprite
-        screen.blit(bg_main, (0, 0))
+        screen.blit(current_background, (0, 0))
         draw_text("PAUSE MENU !!!", menu_font_big, RED, 250, 60)
-        draw_text("Press Enter to Resume", menu_font_small, WHITE, 300, 500)
-
+        draw_text("Press Enter to Resume", menu_font_small, WHITE, 300, 450)
+        draw_text("Press Space to Quit", menu_font_small, WHITE, 300, 500)
     elif END_MENU:
         if fighter1.health == 0:
             # menggambar background kemenangan La Squadra dan karakter fighter2
@@ -69,7 +70,13 @@ def draw_menu():
             # menggambar background kemenangan Green Legion dan karakter fighter1
             screen.blit(glwin_img, (0, 0))
             fighter1.menu_character(screen)
-    else:
+    elif BACKGROUND_MENU:
+        # menggambar background menu untuk pemilihan arena betumbuks
+        screen.blit(bg_img, (0, 0))
+        draw_text("Select Arena", menu_font_big, RED, 260, 260)
+        draw_text("1. Gate of Itera", menu_font_small, WHITE, 260, 350)
+        draw_text("2. Stadium of Cambodia", menu_font_small, WHITE, 260, 380)
+    elif MENU:
         # menggambar background menu utama dan karakter fighter1
         screen.blit(bg_img, (0, 0))
         fighter1.menu_character(screen)
@@ -86,6 +93,10 @@ fighter2 = LaSquadra(760, 260, True, BOXER_DATA, lasquadra_sheet, BOXER_ANIMATIO
 green_health_bar = GreenLegion_Health(fighter1.health, 20, 20)
 lasquad_health_bar = LaSquadra_Health(fighter2.health, 580, 20)
 
+# menu pilihan
+BACKGROUND_MENU = False
+current_background = bg_main  # background default
+
 # game loop
 run = True
 while run:
@@ -94,24 +105,59 @@ while run:
     if MENU:
         # Menggambar latar belakang menu
         draw_menu()
-        
+
         # Mengambil input tombol keyboard
         key = pygame.key.get_pressed()
-        
-        # Jika tombol "Enter" ditekan, keluar dari menu
+
+        # Jika tombol "Enter" ditekan, tampilkan menu pilihan background
         if key[pygame.K_RETURN]:
+            BACKGROUND_MENU = True
             MENU = False
-            round_over = False
-        
+            PAUSE_MENU = False
+
         # Jika dalam menu akhir dan tombol "Enter" ditekan, keluar dari permainan
         if END_MENU:
             if key[pygame.K_RETURN]:
                 run = False
 
+    # Menu pilihan background
+    elif BACKGROUND_MENU:
+        # Menggambar menu pilihan background
+        draw_menu()
+
+        # Mengambil input tombol keyboard
+        key = pygame.key.get_pressed()
+
+        # Jika tombol "1" ditekan, pilih background utama dan mulai permainan
+        if key[pygame.K_1]:
+            current_background = bg_main
+            BACKGROUND_MENU = False
+            MENU = False
+
+        # Jika tombol "2" ditekan, pilih background olympic dan mulai permainan
+        if key[pygame.K_2]:
+            current_background = bg_main2
+            BACKGROUND_MENU = False
+            MENU = False
+            
+    elif PAUSE_MENU:
+            draw_menu()
+
+            # Mengambil input tombol keyboard
+            key = pygame.key.get_pressed()
+
+            # Jika tombol "Enter" ditekan, lanjutkan permainan
+            if key[pygame.K_RETURN]:
+                PAUSE_MENU = False
+                
+            # Jika tombol "Space" ditekan, menutup permainan
+            if key[pygame.K_SPACE]:
+                pygame.quit()
+    
     # Saat permainan sedang berjalan
-    else:
+    else:        
         # Menggambar latar belakang
-        screen.blit(bg_main, (0, 0))
+        screen.blit(current_background, (0, 0))
 
         # Menampilkan status fighter 1 dan fighter 2
         green_health_bar.update(fighter1.health)
@@ -163,7 +209,6 @@ while run:
 
     # Jika tombol "Escape" ditekan, tampilkan menu utama
     if key[pygame.K_ESCAPE]:
-        MENU = True
         PAUSE_MENU = True
 
     # Memperbarui layar
