@@ -29,7 +29,7 @@ green_legion_fx = pygame.mixer.Sound("assets/audio/punch.wav")
 lasquadra_fx = pygame.mixer.Sound("assets/audio/uh.wav")
 
 # Volume
-pygame.mixer.music.set_volume(0)
+pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1, 0.0, 5000)
 green_legion_fx.set_volume(1)
 lasquadra_fx.set_volume(1)
@@ -128,13 +128,13 @@ while run:
         # Mengambil input tombol keyboard
         key = pygame.key.get_pressed()
 
-        # Jika tombol "1" ditekan, pilih background utama dan mulai permainan
+        # Jika tombol "1" ditekan, pilih background gate of itera dan mulai permainan
         if key[pygame.K_1]:
             current_background = bg_main
             BACKGROUND_MENU = False
             MENU = False
 
-        # Jika tombol "2" ditekan, pilih background olympic dan mulai permainan
+        # Jika tombol "2" ditekan, pilih background stadium of cambodia dan mulai permainan
         if key[pygame.K_2]:
             current_background = bg_main2
             BACKGROUND_MENU = False

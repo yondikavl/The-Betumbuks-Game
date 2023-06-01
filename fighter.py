@@ -62,6 +62,7 @@ class Fighter:
     def update(self):
         pass
 
+    # menampilkan karakter di menu
     def menu_character(self, surface):
         animation_cooldown = 50
         # update image
@@ -77,6 +78,7 @@ class Fighter:
                 self.action = 0
         surface.blit(pygame.transform.scale_by(self.image, 1.25), (350, 200))
 
+    # melakukan serangan
     def attack(self, target):
         if self.attack_cooldown == 0:
             # Melakukan serangan jika cooldown serangan = 0
@@ -95,13 +97,14 @@ class Fighter:
             else:
                 target.hit = False
 
-
+    # mengecek action yang dilakukan
     def update_action(self, new_action):
         if new_action != self.action: # jika tindakan baru berbeda dengan tindakan sebelumnya
             self.action = new_action # update tindakan dengan tindakan baru
             self.frame_index = 0 # atur ulang indeks frame untuk animasi
             self.update_time = pygame.time.get_ticks() # atur ulang waktu pembaruan animasi
 
+    # memposisikan karakter
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
         surface.blit(
@@ -137,16 +140,12 @@ class GreenLegion(Fighter):
             if key[pygame.K_s] and self.jump == False: # jika tombol "space" ditekan dan karakter belum sedang melompat
                 self.vel_y = -25 # atur kecepatan vertikal karakter
                 self.jump = True  # atur "jump" ke True
-            if (key[pygame.K_e] or key[pygame.K_r] or key[pygame.K_q] or key[pygame.K_w]):
+            if (key[pygame.K_e] or key[pygame.K_q]):
                 self.attack(target)  # panggil metode "attack" dengan parameter "target"
                 if key[pygame.K_e]:
                     self.attack_type = 1
-                if key[pygame.K_r]:
-                    self.attack_type = 2
                 if key[pygame.K_q]:
-                    self.attack_type = 4
-                if key[pygame.K_w]:
-                    self.attack_type = 6
+                    self.attack_type = 2
                 
 
         # menerapkan gravitasi
@@ -184,18 +183,10 @@ class GreenLegion(Fighter):
             self.alive = False
             self.update_action(8)
         elif self.attacking == True:
-            if self.attack_type == 1:  # Punch1
-                self.update_action(2)
-            elif self.attack_type == 2:  # Combo Punch
+            if self.attack_type == 1:  # Combo Punch1
                 self.update_action(1)
-            elif self.attack_type == 3:  # Figma Punch
-                self.update_action(3)
-            elif self.attack_type == 4:  # Normal Kick
-                self.update_action(5)
-            elif self.attack_type == 5:  # Combo Kick
-                self.update_action(4)
-            elif self.attack_type == 6:  # Chhotu Kick
-                self.update_action(6)
+            elif self.attack_type == 2:  # Punch
+                self.update_action(2)
         elif self.jump == True:
             self.update_action(0)
         elif self.running == True:
@@ -218,22 +209,14 @@ class GreenLegion(Fighter):
             else:
                 self.frame_index = 0
                 # check if an attack was executed
-                if (self.action == 1 or self.action == 2 or self.action == 3 or self.action == 4 or self.action == 5 or self.action == 6):
+                if (self.action == 1 or self.action == 2):
                     self.attacking = False
                     self.attack_cooldown = 20
                 if target.hit == True:
                     if self.action == 1:
-                        target.health -= 30
+                        target.health -= 20
                     if self.action == 2:
-                        target.health -= 12
-                    if self.action == 3:
-                        target.health -= 25
-                    if self.action == 4:
-                        target.health -= 18
-                    if self.action == 5:
                         target.health -= 15
-                    if self.action == 6:
-                        target.health -= 12
 
 class LaSquadra(Fighter):
     def move(self, screen_width, screen_height, surface, target, round_over):
@@ -260,16 +243,12 @@ class LaSquadra(Fighter):
             if key[pygame.K_UP] and self.jump == False: # jika tombol "UP ARROW" ditekan dan karakter belum sedang melompat
                 self.vel_y = -25 # atur kecepatan vertikal karakter
                 self.jump = True  # atur "jump" ke True
-            if key[pygame.K_p] or key[pygame.K_o] or key[pygame.K_i] or key[pygame.K_u]:
+            if key[pygame.K_p] or key[pygame.K_o]:
                 self.attack(target) # panggil metode "attack" dengan parameter "target"
                 if key[pygame.K_p]:
                     self.attack_type = 1
                 if key[pygame.K_o]:
                     self.attack_type = 2
-                if key[pygame.K_i]:
-                    self.attack_type = 4
-                if key[pygame.K_u]:
-                    self.attack_type = 6
 
         # menerapkan gravitasi
         self.vel_y += GRAVITY # Menambahkan kecepatan vertikal karena efek gravitasi
@@ -307,18 +286,10 @@ class LaSquadra(Fighter):
             self.alive = False
             self.update_action(8)
         elif self.attacking == True:
-            if self.attack_type == 1:  # Punch1
-                self.update_action(2)
-            elif self.attack_type == 2:  # Combo Punch
+            if self.attack_type == 1:  # Combo Punch1
                 self.update_action(1)
-            elif self.attack_type == 3:  # Figma Punch
-                self.update_action(3)
-            elif self.attack_type == 4:  # Normal Kick
-                self.update_action(5)
-            elif self.attack_type == 5:  # Combo Kick
-                self.update_action(4)
-            elif self.attack_type == 6:  # Chhotu Kick
-                self.update_action(6)
+            elif self.attack_type == 2:  # Punch
+                self.update_action(2)
         elif self.jump == True:
             self.update_action(0)
         elif self.running == True:
@@ -341,19 +312,11 @@ class LaSquadra(Fighter):
             else:
                 self.frame_index = 0
                 # check if an attack was executed
-                if (self.action == 1 or self.action == 2 or self.action == 3 or self.action == 4 or self.action == 5 or self.action == 6):
+                if (self.action == 1 or self.action == 2):
                     self.attacking = False
                     self.attack_cooldown = 20
                 if target.hit == True:
                     if self.action == 1:
-                        target.health -= 30
-                    if self.action == 2:
-                        target.health -= 12
-                    if self.action == 3:
-                        target.health -= 25
-                    if self.action == 4:
-                        target.health -= 18
-                    if self.action == 5:
                         target.health -= 15
-                    if self.action == 6:
-                        target.health -= 12
+                    if self.action == 2:
+                        target.health -= 20
